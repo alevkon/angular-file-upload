@@ -65,12 +65,14 @@ module
              * @param {File|HTMLInputElement|Object|FileList|Array<Object>} files
              * @param {Object} [options]
              * @param {Array<Function>|String} filters
+             * @returns {Array<Object>} actually added FileItems
              */
             FileUploader.prototype.addToQueue = function(files, options, filters) {
                 var list = this.isArrayLikeObject(files) ? files: [files];
                 var arrayOfFilters = this._getFilters(filters);
                 var count = this.queue.length;
                 var addedFileItems = [];
+                var result = [];
 
                 angular.forEach(list, function(some /*{File|HTMLInputElement|Object}*/) {
                     var temp = new FileUploader.FileLikeObject(some);
@@ -79,6 +81,7 @@ module
                         var fileItem = new FileUploader.FileItem(this, some, options);
                         addedFileItems.push(fileItem);
                         this.queue.push(fileItem);
+                        result.push(fileItem);
                         this._onAfterAddingFile(fileItem);
                     } else {
                         var filter = this.filters[this._failFilterIndex];
@@ -93,6 +96,8 @@ module
 
                 this._render();
                 if (this.autoUpload) this.uploadAll();
+
+                return result;
             };
             /**
              * Remove items from the queue. Remove last: index = -1
